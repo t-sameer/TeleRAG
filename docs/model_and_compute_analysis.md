@@ -31,7 +31,26 @@ The choice of **Gemma 4 E4B-it** (Edge 4 Billion parameters) is highly optimized
 
 ---
 
-## 2. Training Time Feasibility (Kaggle Quota limits)
+## 2. Model Selection & Comparison: Gemma 4 vs. Alternatives
+
+To justify the selection of **Gemma 4 E4B-it**, we evaluated it against other instruction-tuned and domain-specific models mentioned in the hackathon resources and the broader open-source ecosystem, keeping the strict 16GB VRAM constraint in mind:
+
+| Model | Size | VRAM (Train, 4-bit) | VRAM (Infer, 4-bit) | Pros | Cons | Verdict |
+|---|---|---|---|---|---|---|
+| **Gemma 4 E4B-it** | 4B | ~7.5 GB | ~2.8 GB | Perfect balance of size and reasoning capability. Leaves 8GB+ headroom. | Slightly lower general world knowledge than 8B models. | 🏆 **Selected** - Safest and most efficient for T4. |
+| **Llama 3.1 8B Instruct** | 8B | ~12.5 GB | ~5.8 GB | State-of-the-art instruction following and reasoning for its class. | VRAM is too tight during QLoRA training on T4. High risk of OOM with long RAG contexts. | ❌ **Rejected** - Too heavy for safe CPT/SFT on Kaggle. |
+| **Phi-3 Mini (3.8B)** | 3.8B | ~7.0 GB | ~2.5 GB | Excellent at logic/math, very lightweight. | Weaker at domain adaptation (CPT) and strict format adherence (JSON/CoT) than Gemma. | ❌ **Rejected** - Less flexible for telecom adaptation. |
+| **Qwen 2.5 (3B / 7B)** | 3B/7B| ~6.5 GB / ~11 GB | ~2.5 GB / ~5 GB | Extremely strong coding, long context handling. | 7B is too heavy; 3B lacks the reasoning depth of Gemma 4. | ❌ **Rejected** - Gemma 4 offers a better baseline. |
+| **Telecom-Specific Models** | 7B+ | >10 GB | >5 GB | Pre-trained on telecom standards (e.g., 3GPP/TeleQnA). | Usually based on older architectures (Llama 2) or closed source. High VRAM. | ❌ **Rejected** - Better to adapt a modern base model. |
+
+**Why Gemma 4 E4B wins for TeleRAG:**
+The hackathon strictly limits us to T4 GPUs (16GB VRAM) on Kaggle/Colab free tiers. While **Llama 3.1 8B** is an industry standard, its memory footprint during QLoRA training leaves less than 3GB of headroom. Since telecom documents (3GPP specs, O-RAN tables) require large context windows (up to 8K tokens) and multi-step reasoning (CoT), Llama 3.1 would inevitably cause Out-Of-Memory (OOM) crashes. 
+
+Conversely, **Gemma 4 E4B** provides over 8GB of VRAM headroom, allowing us to safely process multiple retrieved chunks and generate complex anomaly RCA traces without risking session crashes. Building our own telecom-specific model via CPT + SFT on Gemma 4 is vastly superior to wrestling with the VRAM limits of 8B models or using outdated pre-trained telecom variants.
+
+---
+
+## 3. Training Time Feasibility (Kaggle Quota limits)
 
 Kaggle provides **30 hours per week** of T4x2 GPU time per account. We have 2 team members, meaning **60 hours/week total**.
 
@@ -51,7 +70,7 @@ Kaggle provides **30 hours per week** of T4x2 GPU time per account. We have 2 te
 
 ---
 
-## 3. The Hidden Killers: Disk Space & CPU RAM
+## 4. The Hidden Killers: Disk Space & CPU RAM
 
 While GPU limits are fine, Kaggle and Colab free tiers have strict non-GPU limits that frequently fail hackathon projects.
 
@@ -69,7 +88,7 @@ While GPU limits are fine, Kaggle and Colab free tiers have strict non-GPU limit
 
 ---
 
-## 4. Final Platform Allocation Strategy
+## 5. Final Platform Allocation Strategy
 
 To survive the hackathon without paying for compute:
 
@@ -80,7 +99,7 @@ To survive the hackathon without paying for compute:
 | **UI Dev & Inference Testing** | **Colab T4** (Secondary) | Streamlit runs well on Colab via `localtunnel`. Colab starts faster for rapid code testing. |
 | **10K Final Evaluation** | **Kaggle** | The full 10K RAG evaluation will take 3-4 hours of inference time. Kaggle won't disconnect. |
 
-## 5. Conclusion & Confidence
+## 6. Conclusion & Confidence
 **Feasibility Score: 9.5 / 10**
 
-The architecture is perfectly sized for free tiers. By selecting the Gemma 4 E4B (4B params) instead of a heavier 7B/8B model (like Llama 3 8B), we completely eliminated VRAM pressure. Unsloth is the MVP here, allowing us to do aggressive CPT and CoT optimization without hitting quota ceilings. As long as we strictly manage Kaggle's 20GB disk limit during training, compute will not block this project.
+The architecture is perfectly sized for free tiers. By selecting the Gemma 4 E4B (4B params) instead of a heavier 7B/8B model (like Llama 3.1 8B), we completely eliminated VRAM pressure while maintaining strong multi-step reasoning capabilities. Unsloth is the MVP here, allowing us to do aggressive CPT and CoT optimization without hitting quota ceilings. As long as we strictly manage Kaggle's 20GB disk limit during training, compute will not block this project.
