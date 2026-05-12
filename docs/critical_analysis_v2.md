@@ -9,18 +9,18 @@ I re-read every line of the problem statement and cross-referenced against the p
 | # | Requirement (verbatim from PS) | Covered? | Where in Plan | Gaps/Risks |
 |---|---|---|---|---|
 | R1 | "Domain-Specific RAG System fine-tuned to telecom RAN tasks" | ✅ | §2, §5 | — |
-| R2 | "Integration with telecom-specific knowledge bases" | ✅ | §5.1 (3 ChromaDB collections) | — |
-| R3 | "Use of public datasets like TeleQnA and O-RAN" | ⚠️ | §5.2 | **TeleQnA ✅, O-RAN data still uncertain** (see Bottleneck #1) |
+| R2 | "Integration with telecom-specific knowledge bases" | ✅ | §5.1 (4 ChromaDB collections) | — |
+| R3 | "Use of public datasets like TeleQnA and O-RAN" | ✅ | §5.2 | ✅ **TeleQnA ✅, O-RAN ✅ (ORAN-Bench + Colosseum)** |
 | R4 | "Support for multi-step reasoning for root cause analysis" | ✅ | §3 (RCA CoT engine) | — |
 | R5 | "Support for multi-step reasoning for anomaly detection" | ✅ | §3 (Anomaly detector + RCA) | — |
 | R6 | "Processing and responding to queries in near real-time" | ⚠️ | §4 (VRAM budget) | **No latency target defined.** Need to measure and report inference time. See Bottleneck #3 |
 | R7 | "Minimize resource usage (RAM, GPU)" | ✅ | §4 (12.5GB / 16GB) | — |
 | R8 | "Techniques like LoRA, chunk optimization, re-ranking" | ✅ | §2 (all three present) | — |
-| R9 | "Adhere to telecom industry data privacy standards" | ❌ **MISSING** | Nowhere in plan | **CRITICAL GAP.** See Gap #1 |
-| R10 | "Does not expose sensitive information" | ❌ **MISSING** | Nowhere in plan | **CRITICAL GAP.** See Gap #1 |
+| R9 | "Adhere to telecom industry data privacy standards" | ✅ | §9 (NEW) | ✅ **Added Security & Privacy layer** |
+| R10 | "Does not expose sensitive information" | ✅ | §9 (NEW) | ✅ **Input/Output sanitization added** |
 | R11 | "Faithful and interpretable responses" | ✅ | §2.6 (Self-RAG, citations) | — |
 | R12 | "Clearly indicating the sources of retrieved information" | ✅ | §2.6 (Citation enforcement) | — |
-| R13 | "Reasoning behind generated outputs" | ⚠️ | Partially via CoT | Need **explicit reasoning trace** in output, not just answer. See Gap #2 |
+| R13 | "Reasoning behind generated outputs" | ✅ | Gap #2 | ✅ **Explicit reasoning traces included** |
 | R14 | "Working RAG application and demonstration on various use cases" | ✅ | §7 Notebook 3 (3 Streamlit modes) | — |
 
 ### 1.2 KPI Requirements
